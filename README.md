@@ -87,3 +87,63 @@ real_t normaL2Residuo(Matriz_t *matriz, Matriz_t *inversa);
 */
 int decomposicaoLU(Matriz_t *matriz,Matriz_t *inversa,real_t *Ttriangulo,real_t *Tcaly,real_t *Tcalx,int p);
 ```
+
+Segue abaixo destaque para o nucleo do algoritmo da função de decompusição e fatoração LU. 
+```c
+int decomposicaoLU(Matriz_t *matriz,Matriz_t *inversa,real_t *Ttriangulo,real_t *Tcaly,real_t *Tcalx,int p){
+    // AUX é uma copia da Matriz 
+    for (i = 0; i <= matriz->n; i++)
+        P[i] = i; //preenche o vetor de permutacão
+    //---------------------------triangularizacão de matriz ----------------//
+    for (i = 0; i < matriz->n; i++) {    
+        maxA = 0.0;
+        maior = i;
+        for (k = i; k < matriz->n; k++)                   
+            if ((absA = fabs(AUX->A[k][i])) > maxA) {  //verifica se o elementoda diagonal e nulo
+                maxA = absA;
+                maior = k;
+            }
+        if (maxA == 0) 
+            return 1; //falha, determinante da matriz nulo
+        //--------------pivoteamento parcial opcional-------------------//
+        if (p){                                                         //
+            if (maior != i) {                                           //
+                //pivoteamento em P                                     //
+                j = P[i];                                               //
+                P[i] = P[maior];                                        //
+                P[maior] = j;                                           //
+                                                                        //
+                //pivoteamento nas linhas da matriz                     //
+                ptr = AUX->A[i];                                        //
+                AUX->A[i] = AUX->A[maior];                              //
+                AUX->A[maior] = ptr;                                    //
+                                                                        //
+            }                                                           //
+        }                                                               //
+        //--------------------------------------------------------------//
+
+        //elimianacao de gauss
+        for (j = i+1; j < matriz->n; j++) {
+            AUX->A[j][i] /= AUX->A[i][i];
+            for (k = i+1; k < matriz->n; k++)
+                AUX->A[j][k] -= AUX->A[j][i] * AUX->A[i][k];
+        }
+    }
+    //------------------fim da traingularizacao -----------------------------//
+
+    //------------------Calculo de Ly = b------------------------------------//
+    *Tcaly = timestamp();
+    for (j = 0; j < matriz->n; j++) {
+        for (i = 0; i < matriz->n; i++) {
+            inversa->A[i][j] = P[i] == j ? 1.0 : 0.0;
+
+            for (k = 0; k < i; k++)
+               inversa->A[i][j] -= AUX->A[i][k] *inversa->A[k][j];
+        }
+    }    
+    //-----------------------------------------------------------------------//
+
+    /*...*/
+}
+
+```
