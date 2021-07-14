@@ -88,7 +88,7 @@ real_t normaL2Residuo(Matriz_t *matriz, Matriz_t *inversa);
 int decomposicaoLU(Matriz_t *matriz,Matriz_t *inversa,real_t *Ttriangulo,real_t *Tcaly,real_t *Tcalx,int p);
 ```
 
-Segue abaixo destaque para o nucleo do algoritmo da função de decompusição e fatoração LU. 
+Segue abaixo destaque para os nucleos do algoritmo da função de decompusição e fatoração LU (triangularizacão de matriz, pivoteamento, elimianacao de gauss e Calculo de Ly-b). 
 ```c
 int decomposicaoLU(Matriz_t *matriz,Matriz_t *inversa,real_t *Ttriangulo,real_t *Tcaly,real_t *Tcalx,int p){
     // AUX é uma copia da Matriz 
@@ -132,7 +132,6 @@ int decomposicaoLU(Matriz_t *matriz,Matriz_t *inversa,real_t *Ttriangulo,real_t 
     //------------------fim da traingularizacao -----------------------------//
 
     //------------------Calculo de Ly = b------------------------------------//
-    *Tcaly = timestamp();
     for (j = 0; j < matriz->n; j++) {
         for (i = 0; i < matriz->n; i++) {
             inversa->A[i][j] = P[i] == j ? 1.0 : 0.0;
